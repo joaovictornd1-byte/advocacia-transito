@@ -13,16 +13,21 @@ export const MAX_FILE_SIZE_MB = 10;
 export const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 export const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
 
-// Etapa 1 — Identificação
+// Etapa 1 – Identificação
 export const identificationSchema = z.object({
   fullName: z.string().trim().min(5, "Informe seu nome completo."),
   cpf: z
     .string()
-    .trim()
-    .min(11, "CPF inválido.")
-    .regex(/^[0-9.\-]{11,14}$/, "Informe um CPF válido."),
-  phone: z.string().trim().min(10, "Informe um telefone válido."),
-  whatsapp: z.string().trim().min(10, "Informe um número de WhatsApp válido."),
+    .transform((val) => val.replace(/\D/g, ""))
+    .refine((val) => val.length === 11, { message: "Informe um CPF válido." }),
+  phone: z
+    .string()
+    .transform((val) => val.replace(/\D/g, ""))
+    .refine((val) => val.length >= 10 && val.length <= 11, { message: "Informe um telefone válido." }),
+  whatsapp: z
+    .string()
+    .transform((val) => val.replace(/\D/g, ""))
+    .refine((val) => val.length >= 10 && val.length <= 11, { message: "Informe um número de WhatsApp válido." }),
   email: z.string().trim().email("Informe um e-mail válido."),
 });
 
