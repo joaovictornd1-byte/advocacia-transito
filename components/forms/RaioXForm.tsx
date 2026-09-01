@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -41,13 +41,11 @@ export function RaioXForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | undefined>();
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const honeypotRef = useRef<HTMLInputElement>(null);
-
-  const {
+ const {
     register,
     trigger,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<LeadFormValues>({
     resolver: zodResolver(leadFormSchema),
@@ -143,21 +141,55 @@ async function goNext() {
         {currentStep.key === "identification" && (
 <>
             <FieldWrapper label="Nome completo" htmlFor="fullName" required error={errors.fullName?.message}>
-              <TextInput id="fullName" name="fullName" hasError={!!errors.fullName} {...register("fullName")} />
+              <Controller
+                name="fullName"
+                control={control}
+                render={({ field }) => (
+                  <TextInput id="fullName" hasError={!!errors.fullName} {...field} />
+                )}
+              />
             </FieldWrapper>
+
             <FieldWrapper label="CPF" htmlFor="cpf" required error={errors.cpf?.message}>
-              <TextInput id="cpf" name="cpf" placeholder="000.000.000-00" hasError={!!errors.cpf} {...register("cpf")} />
+              <Controller
+                name="cpf"
+                control={control}
+                render={({ field }) => (
+                  <TextInput id="cpf" placeholder="000.000.000-00" hasError={!!errors.cpf} {...field} />
+                )}
+              />
             </FieldWrapper>
+
             <div className="grid gap-5 sm:grid-cols-2">
               <FieldWrapper label="Telefone" htmlFor="phone" required error={errors.phone?.message}>
-                <TextInput id="phone" name="phone" hasError={!!errors.phone} {...register("phone")} />
+                <Controller
+                  name="phone"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput id="phone" hasError={!!errors.phone} {...field} />
+                  )}
+                />
               </FieldWrapper>
+
               <FieldWrapper label="WhatsApp" htmlFor="whatsapp" required error={errors.whatsapp?.message}>
-                <TextInput id="whatsapp" name="whatsapp" hasError={!!errors.whatsapp} {...register("whatsapp")} />
+                <Controller
+                  name="whatsapp"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput id="whatsapp" hasError={!!errors.whatsapp} {...field} />
+                  )}
+                />
               </FieldWrapper>
             </div>
+
             <FieldWrapper label="E-mail" htmlFor="email" required error={errors.email?.message}>
-              <TextInput id="email" name="email" type="email" hasError={!!errors.email} {...register("email")} />
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <TextInput id="email" type="email" hasError={!!errors.email} {...field} />
+                )}
+              />
             </FieldWrapper>
           </>
         )}
