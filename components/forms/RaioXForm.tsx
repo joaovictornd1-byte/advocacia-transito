@@ -66,7 +66,7 @@ export function RaioXForm() {
   const currentStep = LEAD_FORM_STEPS[stepIndex];
   const isLastStep = stepIndex === LEAD_FORM_STEPS.length - 1;
 
-  async function goNext() {
+async function goNext() {
     if (currentStep.key === "upload") {
       if (files.length === 0) {
         setFileError("Envie ao menos um documento para análise.");
@@ -78,7 +78,7 @@ export function RaioXForm() {
     }
 
     const fields = STEP_FIELDS[currentStep.key];
-    const valid = fields.length ? await trigger(fields) : true;
+    const valid = fields.length > 0 ? await trigger(fields) : true;
     if (valid) setStepIndex((i) => i + 1);
   }
 
@@ -141,23 +141,23 @@ export function RaioXForm() {
 
       <div className="mt-8 flex flex-col gap-5">
         {currentStep.key === "identification" && (
-          <>
+<>
             <FieldWrapper label="Nome completo" htmlFor="fullName" required error={errors.fullName?.message}>
-              <TextInput id="fullName" hasError={!!errors.fullName} {...register("fullName")} />
+              <TextInput id="fullName" name="fullName" hasError={!!errors.fullName} {...register("fullName")} />
             </FieldWrapper>
             <FieldWrapper label="CPF" htmlFor="cpf" required error={errors.cpf?.message}>
-              <TextInput id="cpf" placeholder="000.000.000-00" hasError={!!errors.cpf} {...register("cpf")} />
+              <TextInput id="cpf" name="cpf" placeholder="000.000.000-00" hasError={!!errors.cpf} {...register("cpf")} />
             </FieldWrapper>
             <div className="grid gap-5 sm:grid-cols-2">
               <FieldWrapper label="Telefone" htmlFor="phone" required error={errors.phone?.message}>
-                <TextInput id="phone" hasError={!!errors.phone} {...register("phone")} />
+                <TextInput id="phone" name="phone" hasError={!!errors.phone} {...register("phone")} />
               </FieldWrapper>
               <FieldWrapper label="WhatsApp" htmlFor="whatsapp" required error={errors.whatsapp?.message}>
-                <TextInput id="whatsapp" hasError={!!errors.whatsapp} {...register("whatsapp")} />
+                <TextInput id="whatsapp" name="whatsapp" hasError={!!errors.whatsapp} {...register("whatsapp")} />
               </FieldWrapper>
             </div>
             <FieldWrapper label="E-mail" htmlFor="email" required error={errors.email?.message}>
-              <TextInput id="email" type="email" hasError={!!errors.email} {...register("email")} />
+              <TextInput id="email" name="email" type="email" hasError={!!errors.email} {...register("email")} />
             </FieldWrapper>
           </>
         )}
