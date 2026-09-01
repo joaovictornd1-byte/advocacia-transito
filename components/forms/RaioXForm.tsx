@@ -162,20 +162,26 @@ async function goNext() {
             </FieldWrapper>
 
             <div className="grid gap-5 sm:grid-cols-2">
-              <FieldWrapper label="Telefone" htmlFor="phone" required error={errors.phone?.message}>
-                <Controller
-                  name="phone"
-                  control={control}
-                  render={({ field }) => (
-                    <TextInput id="phone" hasError={!!errors.phone} {...field} />
-                  )}
-                />
-              </FieldWrapper>
-
-              <FieldWrapper label="WhatsApp" htmlFor="whatsapp" required error={errors.whatsapp?.message}>
-                <Controller
-                  name="whatsapp"
-                  control={control}
+       {currentStep.key === "situation" && (
+            <FieldWrapper label="Qual é a situação?" htmlFor="situation" required error={errors.situation?.message}>
+              <Controller
+                name="situation"
+                control={control}
+                render={({ field }) => (
+                  <Select id="situation" hasError={!!errors.situation} {...field}>
+                    <option value="" disabled>
+                      Selecione uma opção
+                    </option>
+                    {SITUATION_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              />
+            </FieldWrapper>
+          )}
                   render={({ field }) => (
                     <TextInput id="whatsapp" hasError={!!errors.whatsapp} {...field} />
                   )}
