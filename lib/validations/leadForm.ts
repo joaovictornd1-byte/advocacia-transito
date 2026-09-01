@@ -13,25 +13,32 @@ export const MAX_FILE_SIZE_MB = 10;
 export const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 export const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
 
+// Função auxiliar para contar apenas números
+const onlyDigits = (val: string) => val.replace(/\D/g, "");
+
 // Etapa 1 – Identificação
 export const identificationSchema = z.object({
-  fullName: z.string().trim().min(5, "Informe seu nome completo."),
+  fullName: z.string().trim().min(3, "Informe seu nome completo."),
   cpf: z
     .string()
-    .transform((val) => val.replace(/\D/g, ""))
-    .refine((val) => val.length === 11, { message: "Informe um CPF válido." }),
+    .min(1, "Informe o CPF.")
+    .refine((val) => onlyDigits(val).length === 11, { message: "Informe um CPF válido com 11 dígitos." }),
   phone: z
     .string()
-    .transform((val) => val.replace(/\D/g, ""))
-    .refine((val) => val.length >= 10 && val.length <= 11, { message: "Informe um telefone válido." }),
+    .min(1, "Informe o telefone.")
+    .refine((val) => onlyDigits(val).length >= 10 && onlyDigits(val).length <= 11, {
+      message: "Informe um telefone válido.",
+    }),
   whatsapp: z
     .string()
-    .transform((val) => val.replace(/\D/g, ""))
-    .refine((val) => val.length >= 10 && val.length <= 11, { message: "Informe um número de WhatsApp válido." }),
+    .min(1, "Informe o WhatsApp.")
+    .refine((val) => onlyDigits(val).length >= 10 && onlyDigits(val).length <= 11, {
+      message: "Informe um número de WhatsApp válido.",
+    }),
   email: z.string().trim().email("Informe um e-mail válido."),
 });
 
-// Etapa 2 — Situação
+// Etapa 2 – Situação
 export const situationSchema = z.object({
   situation: z.enum(
     SITUATION_OPTIONS.map((o) => o.value) as [string, ...string[]],
@@ -39,7 +46,7 @@ export const situationSchema = z.object({
   ),
 });
 
-// Etapa 3 — Dados da autuação (opcionais quando o titular ainda não possui todos os dados)
+// Etapa 3 – Dados da autuação
 export const infractionDataSchema = z.object({
   issuingAgency: z.string().trim().optional().or(z.literal("")),
   aitNumber: z.string().trim().optional().or(z.literal("")),
@@ -51,7 +58,7 @@ export const infractionDataSchema = z.object({
   infractionDescription: z.string().trim().optional().or(z.literal("")),
 });
 
-// Etapa 4 — Upload (validado no client antes do envio; ver FileUploadField)
+// Etapa 4 – Upload
 export const uploadSchema = z.object({
   files: z
     .array(
@@ -64,12 +71,12 @@ export const uploadSchema = z.object({
     .min(1, "Envie ao menos um documento para análise."),
 });
 
-// Etapa 5 — Observações
+// Etapa 5 – Observações
 export const notesSchema = z.object({
   notes: z.string().trim().max(2000, "O texto pode ter no máximo 2000 caracteres.").optional().or(z.literal("")),
 });
 
-// Etapa 6 — LGPD
+// Etapa 6 – LGPD
 export const consentSchema = z.object({
   consent: z.literal(true, {
     errorMap: () => ({ message: "É necessário aceitar o tratamento de dados para prosseguir." }),
