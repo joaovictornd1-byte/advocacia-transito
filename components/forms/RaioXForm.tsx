@@ -41,8 +41,10 @@ export function RaioXForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | undefined>();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const honeypotRef = useRef<HTMLInputElement>(null);
- const {
+
+  const {
     register,
     trigger,
     handleSubmit,
@@ -65,7 +67,7 @@ export function RaioXForm() {
   const currentStep = LEAD_FORM_STEPS[stepIndex];
   const isLastStep = stepIndex === LEAD_FORM_STEPS.length - 1;
 
-async function goNext() {
+  async function goNext() {
     if (currentStep.key === "upload") {
       if (files.length === 0) {
         setFileError("Envie ao menos um documento para análise.");
@@ -104,7 +106,6 @@ async function goNext() {
         throw new Error(data.error || "Não foi possível enviar sua documentação.");
       }
 
-      // evento de analytics — ver lib/analytics
       const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
       if (typeof window !== "undefined" && gtag) {
         gtag("event", "form_submit_raio_x");
@@ -125,7 +126,6 @@ async function goNext() {
       onSubmit={handleSubmit(onSubmit)}
       className="mx-auto max-w-2xl rounded-lg border border-line bg-white p-6 shadow-card md:p-10"
     >
-      {/* honeypot anti-spam — invisível para humanos, bots costumam preencher todos os campos */}
       <input
         ref={honeypotRef}
         type="text"
@@ -140,7 +140,7 @@ async function goNext() {
 
       <div className="mt-8 flex flex-col gap-5">
         {currentStep.key === "identification" && (
-<>
+          <>
             <FieldWrapper label="Nome completo" htmlFor="fullName" required error={errors.fullName?.message}>
               <Controller
                 name="fullName"
@@ -162,26 +162,20 @@ async function goNext() {
             </FieldWrapper>
 
             <div className="grid gap-5 sm:grid-cols-2">
-       {currentStep.key === "situation" && (
-            <FieldWrapper label="Qual é a situação?" htmlFor="situation" required error={errors.situation?.message}>
-              <Controller
-                name="situation"
-                control={control}
-                render={({ field }) => (
-                  <Select id="situation" hasError={!!errors.situation} {...field}>
-                    <option value="" disabled>
-                      Selecione uma opção
-                    </option>
-                    {SITUATION_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FieldWrapper>
-          )}
+              <FieldWrapper label="Telefone" htmlFor="phone" required error={errors.phone?.message}>
+                <Controller
+                  name="phone"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput id="phone" hasError={!!errors.phone} {...field} />
+                  )}
+                />
+              </FieldWrapper>
+
+              <FieldWrapper label="WhatsApp" htmlFor="whatsapp" required error={errors.whatsapp?.message}>
+                <Controller
+                  name="whatsapp"
+                  control={control}
                   render={({ field }) => (
                     <TextInput id="whatsapp" hasError={!!errors.whatsapp} {...field} />
                   )}
@@ -203,16 +197,27 @@ async function goNext() {
 
         {currentStep.key === "situation" && (
           <FieldWrapper label="Qual é a situação?" htmlFor="situation" required error={errors.situation?.message}>
-            <Select id="situation" hasError={!!errors.situation} {...register("situation")} defaultValue="">
-              <option value="" disabled>
-                Selecione uma opção
-              </option>
-              {SITUATION_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              name="situation"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  id="situation"
+                  hasError={!!errors.situation}
+                  value={field.value || ""}
+                  onChange={(e) => field.onChange(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Selecione uma opção
+                  </option>
+                  {SITUATION_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            />
           </FieldWrapper>
         )}
 
